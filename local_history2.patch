@@ -1,0 +1,62 @@
+Index: src/test/java/com/test/elements/SupplierDetails.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/com/test/elements/SupplierDetails.java	(date 1575812662240)
++++ src/test/java/com/test/elements/SupplierDetails.java	(date 1575812662240)
+@@ -1,17 +1,20 @@
+ package com.test.elements;
+ 
++import com.test.pojo.RunTimeExpectedData;
+ import com.test.testutils.SeleniumDriverHelper;
++import org.junit.Assert;
+ import org.openqa.selenium.By;
+ import org.openqa.selenium.WebElement;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
+ 
+-import java.util.ArrayList;
+ import java.util.List;
+ 
++import static com.test.constants.TestDataConstants.*;
+ import static com.test.testutils.SeleniumDriverHelper.*;
+ 
+ public class SupplierDetails {
+-    public String postCode;
+-
++    RunTimeExpectedData runTimeExpectedData;
+ 
+     public String billPresentLocator = "//label[contains(@id,'have')]/input";
+     public String billNotPresentLocator = "//label[contains(@id,'no')]/input";
+@@ -25,6 +28,10 @@
+     public String compareGasLocator = "#compare-what-gas";
+     public String compareElectricityLocator = "#compare-what-electricity";
+ 
++    private static final Logger logger = LoggerFactory.getLogger(SupplierDetails.class);
++
++
++
+     public void clickCompareGasAndElectricity(){
+         clickElementUsingJs(findElementByCss(compareGasAndElectricityLocator));
+     }
+@@ -52,8 +59,10 @@
+     public void clickEnergyProvider(String energyProvider) throws InterruptedException {
+         waitForAjax(1000);
+         scrollIntoElementUsingJs(findElementByCss("#dual-energy-suppliers-question"));
+-        //wait(100);
++        waitForAjax(1000);
+         clickElementUsingJs(findElementByCss("#dual-top-six-"+energyProvider+""));
++        Assert.assertTrue("Required provider not selected, please check your selection",findElementByCss("#dual-energy-suppliers-question > div > div > div.radio-buttons.flex-column > label[class*=checked]")
++                                .getAttribute("class").contains("checked"));
+     }
+ 
+ 
+@@ -80,6 +89,7 @@
+ 
+     public void clickNextButton() {
+         List<WebElement> navigationTabs = SeleniumDriverHelper.findElements(By.cssSelector("#header-container > section > ul > li"));
++        navigationTabs.parallelStream().forEach(s->System.out.println("s---"+s.getText()));
+ 
+ 
+         clickElementUsingJs(findElementByCss("#goto-your-energy"));

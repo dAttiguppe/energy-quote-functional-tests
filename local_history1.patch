@@ -1,0 +1,233 @@
+Index: src/test/java/steps/StepDefinition.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/steps/StepDefinition.java	(date 1575813252257)
++++ src/test/java/steps/StepDefinition.java	(date 1575813252257)
+@@ -12,7 +12,6 @@
+ import io.cucumber.datatable.DataTable;
+ import org.junit.Assert;
+ import org.junit.Before;
+-import org.openqa.selenium.By;
+ import org.openqa.selenium.WebDriver;
+ import org.openqa.selenium.support.PageFactory;
+ import org.slf4j.Logger;
+@@ -25,6 +24,7 @@
+ import java.util.Map;
+ 
+ import static com.test.constants.TestDataConstants.*;
++import static com.test.testutils.DriverManager.embedScreenshot;
+ import static com.test.testutils.DriverManager.embedScreenshotIfFailed;
+ import static com.test.testutils.SeleniumDriverHelper.*;
+ import static org.junit.Assert.assertTrue;
+@@ -61,7 +61,7 @@
+         embedScreenshot(scenario);
+     }
+ 
+-    //@After
++    @After
+     public void tearDownTest(Scenario scenario) {
+         embedScreenshotIfFailed(scenario);
+         tearDown();
+@@ -73,82 +73,95 @@
+     }
+ 
+     @Given("the user fills the supplier details")
+-    public void theUserFillsTheSupplierDetails(DataTable supplierDetails) throws Exception{
+-        List<Map<String, String>> list = supplierDetails.asMaps(String.class, String.class);
++    public void theUserFillsTheSupplierDetails(DataTable supplierDetailsDT) throws Exception{
++        initTest();
++        runTimeExpectedData = new RunTimeExpectedData();
++        List<Map<String, String>> list = supplierDetailsDT.asMaps(String.class, String.class);
+         String billPresent = list.get(0).get("billPresent");
+         String energyToBeCompared = list.get(0).get(ENERGY_TO_BE_COMPARED);
+         String energyFromSameSupplier = list.get(0).get(ENERGY_FROM_SAME_SUPPLIER);
+         String currentSupplier = list.get(0).get(CURRENT_SUPPLIER);
+ 
+-        user_Enters_PostCode();
+-        user_Has_Bill(billPresent);
+-        user_Selects_Energy_ToBe_Compared(energyToBeCompared);
+-        user_Selects_Gas_And_Electricity_From_Same_Supplier(energyFromSameSupplier);
+-        user_Chooses_Current_Supplier(currentSupplier);
++        String postCode =  user_Enters_PostCode();
++        logger.info("postcode"+postCode);
++        //runTimeExpectedData.setPostCode(postCode);
++         user_Has_Bill(billPresent);
++         user_Selects_Energy_ToBe_Compared(energyToBeCompared);
++         user_Selects_Gas_And_Electricity_From_Same_Supplier(energyFromSameSupplier);
++         user_Chooses_Current_Supplier(currentSupplier);
++
++        prepareRunTimeExpectedData();
+     }
+ 
+-    public void user_Enters_PostCode() throws Exception {
+-        System.out.println("User enters post code");
+-        initTest();
++    private void prepareRunTimeExpectedData() {
++        runTimeExpectedData = new RunTimeExpectedData();
++        //runTimeExpectedData.setPostCode();
++
++    }
++
++    public String user_Enters_PostCode() throws Exception {
++        //System.out.println("User enters post code");
++
+         findElementByCss("#your-postcode").
+                 sendKeys(POST_CODE);
++        clickElementUsingJs(findElementByCss("#find-postcode"));
++
++        requiredWait(1000);
+ 
+-        SeleniumDriverHelper.findElement(By.id("find-postcode")).click();
+-        String postCode = findElement(By.xpath("//*[@id=\"postcode-question\"]/div/div[1]/div[2]/div/span")).getText();
+-        runTimeExpectedData.setPostCode(POST_CODE);
++
++        String postCode = findElementByXpath("//*[contains(@class,'address-saved-container postcode-only')]/span")
++                .getText();
++        logger.info(postCode);
++        Assert.assertTrue(POST_CODE.equalsIgnoreCase(postCode));
++        runTimeExpectedData.setPostCode(postCode);
++        return postCode;
+     }
+ 
+ 
+     public void user_Has_Bill(String billPresent) {
+-        //List<Map<String, String>> list = dataTable.asMaps(String.class, String.class);
+-        //String bill_present = list.get(0).get("billPresent");
+ 
+-        scrollIntoElementUsingJs(supplierDetails.getBillNotPresent());
++        scrollIntoElementUsingJs( supplierDetails.getBillNotPresent());
+ 
+         if (billPresent.equalsIgnoreCase(ENERGY_BILL_NOT_PRESENT)) {
+-            waitUntilPresenceOfElementLocatedByCss(supplierDetails.noBillCSSLoc,500);
+-            clickElementUsingJs(supplierDetails.getBillNotPresent());
+-            //supplierDetails.getNoBillCSSLoc();
++            waitUntilPresenceOfElementLocatedByCss( supplierDetails.noBillCSSLoc,500);
++            clickElementUsingJs( supplierDetails.getBillNotPresent());
++
+         }
+         else
+             supplierDetails.clickBillPresent();
+     }
+ 
+ 
+-        public void user_Selects_Energy_ToBe_Compared(String energyToBeCompared) {
+-//            List<Map<String, String>> list = dataTable.asMaps(String.class, String.class);
+-//            String energy_to_be_compared = list.get(0).get(ENERGY_TO_BE_COMPARED);
++    public void user_Selects_Energy_ToBe_Compared(String energyToBeCompared) {
+ 
+-            switch(energyToBeCompared){
+-                case GAS: {
+-                    scrollIntoElementUsingJs(supplierDetails.getBillNotPresent());
+-                    supplierDetails.clickCompareGas();
+-                    break;
+-                }
+-                case ELECTRICITY: {
+-                    supplierDetails.clickCompareElectricity();
+-                    break;
+-                }
+-                case GAS_AND_ELECTRICITY: {
+-                    supplierDetails.clickCompareGasAndElectricity();
+-                    break;
+-                }
+-                default:
+-                    logger.info("Not a valid selection");
+-            }
++        switch(energyToBeCompared){
++            case GAS: {
++                scrollIntoElementUsingJs( supplierDetails.getBillNotPresent());
++                supplierDetails.clickCompareGas();
++                break;
++            }
++            case ELECTRICITY: {
++                supplierDetails.clickCompareElectricity();
++                break;
++            }
++            case GAS_AND_ELECTRICITY: {
++                supplierDetails.clickCompareGasAndElectricity();
++                break;
++            }
++            default:
++                logger.info("Not a valid selection");
++        }
+     }
+ 
+ 
+     public void user_Selects_Gas_And_Electricity_From_Same_Supplier(String energyFromSameSupplier){
+-//        List<Map<String, String>> list = dataTable.asMaps(String.class, String.class);
+-//        String energyFromSameSupplier = list.get(0).get(ENERGY_FROM_SAME_SUPPLIER);
+-
+         runTimeExpectedData.setSameEnergySupplier(energyFromSameSupplier);
+ 
+         switch(energyFromSameSupplier){
+-            case ENERGY_FROM_SAME_SUPPLIER_Y:
++            case ENERGY_FROM_SAME_SUPPLIER_Y:{
+                 supplierDetails.clickEnergyFromSameSupplierYes();
+-                break;
++                runTimeExpectedData.setSameEnergySupplier(ENERGY_FROM_SAME_SUPPLIER_Y);
++                break;}
+             case ELECTRICITY:
+                 supplierDetails.clickEnergyFromSameSupplierNo();
+                 break;
+@@ -160,8 +173,6 @@
+ 
+ 
+     public void user_Chooses_Current_Supplier(String currentSupplier) throws InterruptedException {
+-//        List<Map<String, String>> list = dataTable.asMaps(String.class, String.class);
+-//        String currentSupplier = list.get(0).get(CURRENT_SUPPLIER);
+         supplierDetails.clickEnergyProvider(currentSupplier);
+ 
+         if(runTimeExpectedData.getSameEnergySupplier().equalsIgnoreCase("Y")) {
+@@ -170,16 +181,16 @@
+         }
+     }
+ 
+-    @Then("the user proceeds to the next page")
++
++
++    @And("the user proceeds to the Your energy page")
+     public void user_Proceeds_To_Next_Page(){
+         supplierDetails.clickNextButton1();
+         waitForAjax(500);
+-
+         assertTrue(supplierDetails.getCurrentPageClass().contains("current"));
+-
+     }
+ 
+-    @Given("the user selects the your electricity fields")
++    @When("the user selects the your electricity fields")
+     public void user_Selects_Electricity_Usage_Values(DataTable yourElectricity) throws Exception {
+         List<Map<String, String>> list = yourElectricity.asMaps(String.class, String.class);
+         YourElectricity userElectricityUsage = new YourElectricity();
+@@ -204,11 +215,8 @@
+ 
+     }
+ 
+-    @Then("the user proceeds to the your preferences page")
++    @And("the user proceeds to the Your preferences page")
+     public void user_Proceeds_To_Next_Page1(){
+-//        scrollIntoElementUsingJs(findElementByCss("#goto-your-energy"));
+-//        supplierDetails.clickNextButton();
+-//        waitForAjax(500);
+ 
+         assertTrue(findElementByXpath("//*[@id=\"nav-your-supplier\"][contains(@ng-switch,'Enabled')]").getAttribute("ng-switch").contains("Enabled"));
+         assertTrue(findElementByXpath("//*[@id=\"nav-your-energy\"][contains(@ng-switch,'Enabled')]").getAttribute("ng-switch").contains("Enabled"));
+@@ -247,7 +255,7 @@
+ 
+     }
+ 
+-    @When("the user confirms to the TermsAndConditions")
++    @And("the user confirms to the TermsAndConditions")
+     public void the_user_confirms_to_the_TermsAndConditions() {
+         userPreferences.acceptTermsAndConditions();
+     }
+@@ -289,7 +297,7 @@
+         availableTariffs.verifyTariffsIncludeProvidersCantSwitchTo();
+     }
+ 
+-    @Then("all the available tariffs should be displayed")
++    @Then("all the available tariffs including the user can't switch to should be displayed")
+     public void allTheAvailableTariffsShouldBeDisplayed() {
+     }
+ 

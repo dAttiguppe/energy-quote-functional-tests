@@ -1,0 +1,14 @@
+target/
+test-output/
+.settings/
+.project
+.classpath
+automation.log
+automation.log.*
+/.idea
+*.iml
+.m2/
+out
+reports
+.class
+.patch
