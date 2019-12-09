@@ -1,5 +1,5 @@
 
-## **energycomparisonfunctionaltests**
+## **energy-comparison-functional-tests**
 
 This project is dedicated to testing the CTM energy comparison journey via Selenium/Java/Cucumber-JVM facilities.
 
@@ -10,7 +10,7 @@ Test scenarios are described in the feature files located here ./src/test/resour
 
 
 Java Maven Cucumber Selenium Setup	
-Java + Junit + Cucumber + Selenium testing cases
+Java + Junit + Cucumber + Selenium test cases
 
 This repo contains the Maven setup for Cucumber / Selenium, with tests around energy comparison journey on the CTM website, which can be run on local browsers. 
 
