@@ -10,7 +10,33 @@ public class RunTimeExpectedData {
     public String electricitySupplier;
     public String projection;
     public String gasSupplierName;
+    public boolean isOnlyGasSupplier;
+    public boolean isOnlyElectricitySupplier;
+    public String tariff;
 
+    public String getTariff() {
+        return tariff;
+    }
+
+    public void setTariff(String tariff) {
+        this.tariff = tariff;
+    }
+
+    public boolean isOnlyGasSupplier() {
+        return isOnlyGasSupplier;
+    }
+
+    public void setOnlyGasSupplier(boolean onlyGasSupplier) {
+        isOnlyGasSupplier = onlyGasSupplier;
+    }
+
+    public boolean isOnlyElectricitySupplier() {
+        return isOnlyElectricitySupplier;
+    }
+
+    public void setOnlyElectricitySupplier(boolean onlyElectricitySupplier) {
+        isOnlyElectricitySupplier = onlyElectricitySupplier;
+    }
 
     public String getSameEnergySupplier() {
         return sameEnergySupplier;

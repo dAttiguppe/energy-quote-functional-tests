@@ -1,0 +1,73 @@
+The below values are be used in the feature file to run the tests. 
+All values need to be case-sensitive as specified below
+
+Step - Given the user fills the supplier details
+|PostCode   | 
+Any valid post code
+
+|billPresent| 
+Y 
+N 
+
+|EnergyToBeCompared|
+//If using below value in the column fill in 'EnergyFromSameSupplier' column with 'Y'
+Gas&Electricity
+//If using below values in the column fill in 'EnergyFromSameSupplier' column with 'N'
+Gas
+Electricity
+
+Tests need to be implemented to take the value - N
+|EnergyFromSameSupplier|
+Y
+
+One of the below values could be used
+|CurrentSupplierSelection|
+british-gas 
+edf 
+eon
+npower 
+scottish-power 
+sse
+
+
+
+Step-  And the user selects energy usage data
+
+
+Currently the tests work with 'Random' where a random value from the dropdown is selected by the program
+|ElectricityTariff | 
+Random
+
+Tests are in place for 
+|Economy7MeterSelection|
+|No                    |
+
+
+First option from the dropdown is chosen
+|PaymentMode           |
+
+
+Tests are currently in place to run with the input of kWH value
+|CurrentElectricityUsage|
+|kWH                    |
+
+
+Step - And the user selects the preferences
+|TariffType   |
+|FixedTariff  |
+
+
+|PaymentMode |
+|monthly     |
+
+Any valid email id can be included
+|EmailAddress   |
+|test@test.com  |
+
+
+
+Step- When the user filters by four-star supplier rating filter
+
+the below values can replace 'four-star'
+three-star
+five-star

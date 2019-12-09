@@ -23,7 +23,7 @@ public class TestDataConstants {
     public static final String POST_CODE = "PE2 6YS";
     public static final String CURRENT_SUPPLIER = "CurrentSupplierSelection";
 
-    public static final String ELECTRICITY_TARIFF = "ElectricityTariff";
+    public static final String ENERGY_TARIFF = "EnergyTariff";
     public static final String ECONOMY_7METER = "Economy7MeterSelection";
     public static final String PAYMENT_MODE = "PaymentMode";
     public static final String MAIN_SOURCE_OF_HEATING = "MainSourceOfHeating";
@@ -34,4 +34,8 @@ public class TestDataConstants {
 
     public static final String FILTER_TYPE = "FilterType";
     public static final String FILTER_VALUE = "FilterValue";
+
+    public static final String electricityUsage = "10";
+    public static final String gasUsage = "10";
+
 }

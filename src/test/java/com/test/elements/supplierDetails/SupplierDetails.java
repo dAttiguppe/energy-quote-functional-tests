@@ -27,6 +27,9 @@ public class SupplierDetails {
     public String compareGasLocator = "#compare-what-gas";
     public String compareElectricityLocator = "#compare-what-electricity";
 
+    public String energyFromSameSupplierYesLocator = "#same-supplier-yes";
+    public String energyFromSameSupplierNoLocator = "#same-supplier-no";
+
     private static final Logger logger = LoggerFactory.getLogger(SupplierDetails.class);
 
     public void user_Enters_PostCode(RunTimeExpectedData runTimeExpectedData) throws Exception {
@@ -54,8 +57,6 @@ public class SupplierDetails {
         }
     }
 
-
-
     public void clickCompareGasAndElectricity(){
         clickElementUsingJs(findElementByCss(compareGasAndElectricityLocator));
     }
@@ -67,9 +68,6 @@ public class SupplierDetails {
     public void clickCompareElectricity(){
         clickElementUsingJs(findElementByCss(compareElectricityLocator));
     }
-
-    public String energyFromSameSupplierYesLocator = "#same-supplier-yes";
-    public String energyFromSameSupplierNoLocator = "#same-supplier-no";
 
     public void clickEnergyFromSameSupplierYes(){
         clickElementUsingJs(findElementByCss(energyFromSameSupplierYesLocator));
@@ -90,20 +88,31 @@ public class SupplierDetails {
                 .getAttribute("class").contains("checked"));
     }
 
-    public void user_Selects_Energy_ToBe_Compared(String energyToBeCompared, RunTimeExpectedData runTimeExpectedData) {
+    public void user_Selects_Energy_ToBe_Compared(String energyToBeCompared, String currentSupplier,
+                                                  RunTimeExpectedData runTimeExpectedData) {
 
         switch(energyToBeCompared){
             case GAS: {
                 scrollIntoElementUsingJs( getBillNotPresent());
-                 clickCompareGas();
+                clickCompareGas();
+                runTimeExpectedData.setOnlyGasSupplier(true);
+                clickGasSupplier(currentSupplier);
+                runTimeExpectedData.setGasSupplierName(currentSupplier);
                 break;
             }
             case ELECTRICITY: {
-                 clickCompareElectricity();
+                clickCompareElectricity();
+                runTimeExpectedData.setOnlyElectricitySupplier(true);
+                clickElectricitySupplier(currentSupplier);
+                runTimeExpectedData.setElectricitySupplier(currentSupplier);
                 break;
             }
             case GAS_AND_ELECTRICITY: {
-                 clickCompareGasAndElectricity();
+                clickCompareGasAndElectricity();
+                runTimeExpectedData.setSameEnergySupplier("Y");
+                clickEnergyProvider(currentSupplier);
+                runTimeExpectedData.setElectricalSupplierName(currentSupplier);
+                runTimeExpectedData.setGasSupplierName(currentSupplier);
                 break;
             }
             default:
@@ -119,9 +128,10 @@ public class SupplierDetails {
                  clickEnergyFromSameSupplierYes();
                 runTimeExpectedData.setSameEnergySupplier(ENERGY_FROM_SAME_SUPPLIER_Y);
                 break;}
-            case ELECTRICITY:
+            case ENERGY_FROM_SAME_SUPPLIER_N:{
                  clickEnergyFromSameSupplierNo();
-                break;
+                 runTimeExpectedData.setSameEnergySupplier(ENERGY_FROM_SAME_SUPPLIER_N);
+                break;}
             default:
                 logger.info("Not a valid selection");
         }
@@ -129,13 +139,48 @@ public class SupplierDetails {
 
 
     public void user_Chooses_Current_Supplier(String currentSupplier, RunTimeExpectedData runTimeExpectedData){
-         clickEnergyProvider(currentSupplier);
 
         if(runTimeExpectedData.getSameEnergySupplier().equalsIgnoreCase("Y")) {
+            clickEnergyProvider(currentSupplier);
             runTimeExpectedData.setElectricalSupplierName(currentSupplier);
             runTimeExpectedData.setGasSupplierName(currentSupplier);
         }
+        if(runTimeExpectedData.getSameEnergySupplier().equalsIgnoreCase("N")){
+            if(runTimeExpectedData.isOnlyGasSupplier()){
+                clickGasSupplier(currentSupplier);
+                runTimeExpectedData.setGasSupplierName(currentSupplier);
+            }
+        }
+        if(runTimeExpectedData.isOnlyElectricitySupplier()){
+            clickElectricitySupplier(currentSupplier);
+            runTimeExpectedData.setElectricitySupplier(currentSupplier);
+        }
     }
+
+    private void clickGasSupplier(String currentSupplier) {
+
+        waitForAjax(1000);
+        scrollIntoElementUsingJs(findElementByCss("#gas-energy-suppliers-question"));
+        waitForAjax(1000);
+        clickElementUsingJs(findElementByCss("#dual-top-six-"+currentSupplier+""));
+        waitForAjax(1000);
+        assertTrue(findElementByCss("#gas-energy-suppliers-question > div > div > div.radio-buttons.flex-column > label[class*=checked]")
+                .getAttribute("class").contains("checked"));
+
+    }
+
+    private void clickElectricitySupplier(String currentSupplier) {
+
+        waitForAjax(1000);
+        scrollIntoElementUsingJs(findElementByCss("#elec-energy-suppliers-question"));
+        waitForAjax(1000);
+        clickElementUsingJs(findElementByCss("#dual-top-six-"+currentSupplier+""));
+        waitForAjax(1000);
+        assertTrue(findElementByCss("#elec-energy-suppliers-question > div > div > div.radio-buttons.flex-column > label[class*=checked]")
+                .getAttribute("class").contains("checked"));
+
+    }
+
 
 
     public WebElement getBillPresent(){

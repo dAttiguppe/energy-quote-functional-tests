@@ -4,13 +4,10 @@ import com.google.common.base.Function;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.WrapsElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.yandex.qatools.htmlelements.element.HtmlElement;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -252,5 +249,37 @@ public class SeleniumDriverHelper {
             quit();
         }
     }
+
+    public static void acceptAlert() {
+        WebDriver driver = DriverManager.getDriver();
+        Alert alert = driver.switchTo().alert();
+        alert.accept();
+    }
+
+    public static void checkAlertPresentAndAccept() {
+        if (isAlertPresent()) {
+            acceptAlert();
+        }
+    }
+
+    public static boolean isAlertPresent() {
+        return isAlertPresent(3);
+    }
+
+    public static boolean isAlertPresent(long seconds) {
+        boolean isAlertPresent;
+
+        WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), seconds);
+
+        try {
+            wait.until(ExpectedConditions.alertIsPresent());
+            isAlertPresent = true;
+        } catch (TimeoutException e) {
+            isAlertPresent = false;
+        }
+
+        return isAlertPresent;
+    }
+
 
 }

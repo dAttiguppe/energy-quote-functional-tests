@@ -16,7 +16,6 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
-import org.junit.Assert;
 import org.junit.Before;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import static com.test.constants.TestDataConstants.*;
 import static com.test.testutils.DriverManager.embedScreenshot;
 import static com.test.testutils.DriverManager.embedScreenshotIfFailed;
 import static com.test.testutils.SeleniumDriverHelper.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class StepDefinition {
@@ -81,7 +81,7 @@ public class StepDefinition {
 
         supplierDetails.user_Enters_PostCode(runTimeExpectedData);
         supplierDetails.user_Has_Bill(billPresent,runTimeExpectedData);
-        supplierDetails.user_Selects_Energy_ToBe_Compared(energyToBeCompared,runTimeExpectedData);
+        supplierDetails.user_Selects_Energy_ToBe_Compared(energyToBeCompared,currentSupplier,runTimeExpectedData);
         supplierDetails.user_Selects_Gas_And_Electricity_From_Same_Supplier(energyFromSameSupplier,runTimeExpectedData);
         supplierDetails.user_Chooses_Current_Supplier(currentSupplier,runTimeExpectedData);
     }
@@ -94,18 +94,18 @@ public class StepDefinition {
         assertTrue(supplierDetails.getCurrentPageClass().contains("current"));
     }
 
-    @And("the user selects the your electricity fields")
+    @And("the user selects energy usage data")
     public void user_Selects_Electricity_Usage_Values(DataTable yourElectricity) throws Exception {
         List<Map<String, String>> list = yourElectricity.asMaps(String.class, String.class);
         YourElectricity userElectricityUsage = new YourElectricity();
-        HashMap<String, String> electricityUsageData = new HashMap<String, String>();
+        HashMap<String, String> energyUsageData = new HashMap<String, String>();
 
-        electricityUsageData.put(ELECTRICITY_TARIFF,list.get(0).get(ELECTRICITY_TARIFF));
-        electricityUsageData.put(ECONOMY_7METER,list.get(0).get(ECONOMY_7METER));
-        electricityUsageData.put(PAYMENT_MODE,list.get(0).get(PAYMENT_MODE));
-        electricityUsageData.put(MAIN_SOURCE_OF_HEATING,list.get(0).get(MAIN_SOURCE_OF_HEATING));
-        electricityUsageData.put(CURRENT_ELECTRICITY_USAGE,list.get(0).get(CURRENT_ELECTRICITY_USAGE));
-        userElectricityUsage.setElectricityUsageData(electricityUsageData,runTimeExpectedData);
+        energyUsageData.put(ENERGY_TARIFF,list.get(0).get(ENERGY_TARIFF));
+        energyUsageData.put(ECONOMY_7METER,list.get(0).get(ECONOMY_7METER));
+        energyUsageData.put(PAYMENT_MODE,list.get(0).get(PAYMENT_MODE));
+        energyUsageData.put(MAIN_SOURCE_OF_HEATING,list.get(0).get(MAIN_SOURCE_OF_HEATING));
+        energyUsageData.put(CURRENT_ELECTRICITY_USAGE,list.get(0).get(CURRENT_ELECTRICITY_USAGE));
+        userElectricityUsage.setenergyUsageData(energyUsageData,runTimeExpectedData);
     }
 
     @And("the user clicks on Next button")
@@ -182,13 +182,9 @@ public class StepDefinition {
         availableTariffs.clickIncludeProvidersCantSwitchTo();
     }
 
-    @Then("All the available tariffs should be displayed")
+    @Then("all the available tariffs should be displayed")
     public void all_The_Available_Tariffs_Should_Be_Displayed(){
         availableTariffs.verifyTariffsIncludeProvidersCantSwitchTo();
-    }
-
-    @Then("all the available tariffs should be displayed")
-    public void allTheAvailableTariffsShouldBeDisplayed() {
     }
 
     @When("the user filters by (.*) supplier rating filter")
@@ -204,18 +200,18 @@ public class StepDefinition {
 
     @Then("all the more details section should be displayed")
     public void allTheMoreDetailsSectionShouldBeDisplayed() {
-        Assert.assertTrue(findElementByCss(summaryResults.headerTextLocator).getText().contains(summaryResults.headerText));
+        assertTrue(findElementByCss(summaryResults.headerTextLocator).getText().contains(summaryResults.headerText));
     }
 
     @When("the user edits the electricity supplier")
     public void user_Edits_The_Electricity_Supplier() {
         summary.editElectricitySupplier();
-        Assert.assertFalse(findElementByCss("div > h3").isDisplayed());
+        assertFalse(findElementByCss("div > h3").isDisplayed());
     }
 
     @Then("the user lands on the Your Supplier page")
     public void theUserLandsOnTheYourSupplierPage() {
-        Assert.assertTrue(findElementByCss("div.section-header > h2").getText().equalsIgnoreCase(summary.pageHeading));
+        assertTrue(findElementByCss("div.section-header > h2").getText().equalsIgnoreCase(summary.pageHeading));
     }
 
 }

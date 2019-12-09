@@ -1,21 +1,15 @@
 package com.test.elements.summaryResults;
 
+import com.test.elements.common.TariffEndDateModal;
 import com.test.pojo.RunTimeExpectedData;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.yandex.qatools.htmlelements.element.HtmlElement;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
-import static com.test.testutils.SeleniumDriverHelper.findElementByCss;
-import static com.test.testutils.SeleniumDriverHelper.findElementByXpath;
+import static com.test.testutils.SeleniumDriverHelper.*;
 import static com.test.testutils.StringHelper.findIntegerInString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class Summary {
+    TariffEndDateModal tariffEndDateModal = new TariffEndDateModal();
 
     public String projection;
     private final String electricityUsageLocator = "//*[@id=\"personal-usage-amount-electricity\"]";
@@ -27,24 +21,6 @@ public class Summary {
 
     public String editElectricitySupplier = "#your-details-electricity-edit-button";
     public String pageHeading = "Been here before?";
-
-    public HtmlElement getElectricityUsageLoc() {
-        return electricityUsageLoc;
-    }
-
-    public void setElectricityUsageLoc(HtmlElement electricityUsageLoc) {
-        this.electricityUsageLoc = electricityUsageLoc;
-    }
-
-    public String getElectricityUsageText(){
-        return electricityUsageLoc.getText().replace("edit","");
-    }
-
-    @FindBy(xpath = "//*[@id=\"personal-usage-amount-electricity\"]")
-    public HtmlElement electricityUsageLoc;
-
-
-    private static final Logger logger = LoggerFactory.getLogger(Summary.class);
 
     public String getElectricalSupplierSummarySection() {
         return findElementByCss(electricityProviderLocator).getText().replace("edit","");
@@ -66,23 +42,50 @@ public class Summary {
         return findElementByXpath(gasUsageLocator).getText().replace("edit","");
     }
 
-    public Summary(){
-        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(com.test.testutils.DriverManager.getDriver())),
-                this);
-    }
-
     public void compareSummaryDetails(RunTimeExpectedData runTimeExpectedData){
-        //assertEquals(true, findElementByCss(summaryPostCodeLocator).getText().toLowerCase().equalsIgnoreCase(runTimeExpectedData.getPostCode()));
-        assertEquals(true, getGasSupplierSummarySection().equalsIgnoreCase(runTimeExpectedData.getGasSupplierName().replaceAll("-","")));
-        //TODO assertEquals(true, getElectricityUsageText().replaceAll("kWh","").equalsIgnoreCase(runTimeExpectedData.getElectricityUsage()));
-        assertTrue(getElectricalSupplierSummarySection().toLowerCase().
-                equalsIgnoreCase(runTimeExpectedData.getElectricalSupplierName().replaceAll("-","")));
 
-        assertEquals(true, String.valueOf(
-                findIntegerInString(getSummarySectionGasUsage().toLowerCase())).
-                equalsIgnoreCase(runTimeExpectedData.getGasUsage().replaceAll("-", "")));
+        requiredWait(1000);
+        waitForPageLoad();
+        if(tariffEndDateModal.isTariffModalPresent()) {
+            updateTariffModal(runTimeExpectedData);
+        }
+
+        else {
+
+            assertEquals(true, findElementByCss(summaryPostCodeLocator).getText().
+                    toLowerCase().equalsIgnoreCase(runTimeExpectedData.getPostCode()));
+            assertEquals(true, getGasSupplierSummarySection().
+                    equalsIgnoreCase(runTimeExpectedData.getGasSupplierName().replaceAll("-", "")));
+            //TODO assertEquals(true, getElectricityUsageText().replaceAll("kWh","").equalsIgnoreCase(runTimeExpectedData.getElectricityUsage()));
+            assertTrue(getElectricalSupplierSummarySection().toLowerCase().
+                    equalsIgnoreCase(runTimeExpectedData.getElectricalSupplierName().replaceAll("-", "")));
+            //if(runTimeExpectedData.getSameEnergySupplier().equalsIgnoreCase("Y"))
+            requiredWait(1000);
+            assertEquals(true, String.valueOf(
+                    findIntegerInString(getSummarySectionGasUsage().toLowerCase())).
+                    equalsIgnoreCase(runTimeExpectedData.getGasUsage().replaceAll("-", "")));
+        }
     }
 
+    private void updateTariffModal(RunTimeExpectedData runTimeExpectedData) {
+        if(runTimeExpectedData.isOnlyGasSupplier()){
+            tariffEndDateModal.clickGasTariffExpiryDateLocator();
+            tariffEndDateModal.clickUpdateResultsButton();
+            waitForPageLoad();
+        }
+        if(runTimeExpectedData.isOnlyElectricitySupplier()) {
+            tariffEndDateModal.clickElecTariffExpiryDateLocator();
+            tariffEndDateModal.clickUpdateResultsButton();
+            waitForPageLoad();
+        }
+        if(runTimeExpectedData.getSameEnergySupplier().equalsIgnoreCase("Y"))
+        {
+            tariffEndDateModal.clickGasTariffExpiryDateLocator();
+            tariffEndDateModal.clickElecTariffExpiryDateLocator();
+            tariffEndDateModal.clickUpdateResultsButton();
+            waitForPageLoad();
+        }
+    }
 
     public void editElectricitySupplier() {
         findElementByCss(editElectricitySupplier).click();

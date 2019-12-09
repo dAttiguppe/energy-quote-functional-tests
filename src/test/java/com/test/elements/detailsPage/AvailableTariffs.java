@@ -5,9 +5,6 @@ import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.PageFactory;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementDecorator;
-import ru.yandex.qatools.htmlelements.loader.decorator.HtmlElementLocatorFactory;
 
 import java.util.List;
 
@@ -25,11 +22,10 @@ public class AvailableTariffs {
 
     public AvailableTariffs(){
         this.driver = DriverManager.getDriver();
-        PageFactory.initElements(new HtmlElementDecorator(new HtmlElementLocatorFactory(com.test.testutils.DriverManager.getDriver())),
-                this);
     }
 
     public void clickMoreTariffsSection(){
+        waitForAjax(1000);
         scrollToElementUsingJs(findElementByCss("#filters-more-tariffs-view-input"));
         clickElementUsingJs(findElementByXpath(moreTariffsButton));
     }
