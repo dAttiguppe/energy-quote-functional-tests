@@ -48,7 +48,7 @@
         <jackson-mapper-asl.version>1.9.9</jackson-mapper-asl.version>
         <jackson-module-jaxb-annotations.version>2.9.5</jackson-module-jaxb-annotations.version>
         <truecommons-shed.version>2.5.0</truecommons-shed.version>
-        <guava.version>25.0-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <dexx-collection.version>0.7</dexx-collection.version>
     </properties>
 
